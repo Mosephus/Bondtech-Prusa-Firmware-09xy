@@ -225,9 +225,9 @@ uint16_t xyzcal_calc_delay(uint16_t nd, uint16_t dd)
 		if (del_us > 50) return del_us - 50;
 	}
 
-//	uint16_t del_us = (uint16_t)(((float)1000000 / xyzcal_sm4_v) + 0.5);		
-//	uint16_t del_us = (uint32_t)1000000 / xyzcal_sm4_v;		
-//	uint16_t del_us = 100;		
+//	uint16_t del_us = (uint16_t)(((float)1000000 / xyzcal_sm4_v) + 0.5);
+//	uint16_t del_us = (uint32_t)1000000 / xyzcal_sm4_v;
+//	uint16_t del_us = 100;
 //	uint16_t del_us = (uint16_t)10000 / xyzcal_sm4_v;
 //	v += (ac * del_us + 500) / 1000;
 //	xyzcal_sm4_v += (xyzcal_sm4_ac * del_us) / 1000;
@@ -279,7 +279,7 @@ bool xyzcal_spiral2(int16_t cx, int16_t cy, int16_t z0, int16_t dz, int16_t radi
 	uint8_t k = 720 / (dad_max - dad_min); //delta calculation constant
 	ad = 0;
 	if (pad) ad = *pad % 720;
-	
+
     //@size=214
 	DBG(_n("xyzcal_spiral2 cx=%d cy=%d z0=%d dz=%d radius=%d ad=%d\n"), cx, cy, z0, dz, radius, ad);
 	// lcd_set_cursor(0, 4);
@@ -461,7 +461,7 @@ void accelerate_1_step(uint8_t axes, int16_t acc, uint16_t &delay_us, uint16_t m
 		else
 			t1++;
 	}
-	
+
 	//DBG(_n("%d "), t1);
 
 	delayMicroseconds(t1);
@@ -583,8 +583,8 @@ void xyzcal_scan_pixels_32x32_Zhop(int16_t cx, int16_t cy, int16_t min_z, int16_
 
 				accelerate(axes, dir, Z_ACCEL, current_delay_us, Z_MIN_DELAY, half_x);
 				go_and_stop(axes, dir, Z_ACCEL, current_delay_us, length_x - half_x);
-				
-				
+
+
 				z_trig = min_z;
 
 				/// move up to un-trigger (surpress hysteresis)
@@ -698,6 +698,14 @@ uint8_t xyzcal_find_pattern_12x12_in_32x32(uint8_t* pixels, uint16_t* pattern, u
 	*pr = max_r;
 	return max_match;
 }
+uint8_t xyzcal_xycoords2point(int16_t x, int16_t y)
+{
+  uint8_t ix = (x > 10000)?1:0;
+  uint8_t iy = (y > 10000)?1:0;
+  return iy?(3-ix):ix;
+}
+const int16_t xyzcal_point_xcoords[4] PROGMEM = {1200, 22000, 22000, 1200};
+const int16_t xyzcal_point_ycoords[4] PROGMEM = {500, 500, 19000, 19000};
 
 const uint16_t xyzcal_point_pattern_10[12] PROGMEM = {0x000, 0x0f0, 0x1f8, 0x3fc, 0x7fe, 0x7fe, 0x7fe, 0x7fe, 0x3fc, 0x1f8, 0x0f0, 0x000};
 const uint16_t xyzcal_point_pattern_08[12] PROGMEM = {0x000, 0x000, 0x0f0, 0x1f8, 0x3fc, 0x3fc, 0x3fc, 0x3fc, 0x1f8, 0x0f0, 0x000, 0x000};
@@ -801,7 +809,7 @@ void sort(float *points, const uint8_t num_points){
 				SWAP(points[j], points[j + 1]);
 		}
 	}
-	
+
 	// DBG(_n("Sorted: "));
 	// for (uint8_t i = 0; i < num_points; ++i)
 	// 	DBG(_n("%f "), points[i]);
@@ -832,13 +840,13 @@ void dynamic_circle(uint8_t *matrix_32x32, float &x, float &y, float &r, uint8_t
 	const constexpr uint8_t target_z = 32; ///< target z height of the circle
 	const uint8_t blocks = num_points;
 	float shifts_x[blocks];
-	float shifts_y[blocks];	
-	float shifts_r[blocks];	
+	float shifts_y[blocks];
+	float shifts_r[blocks];
 
 	// DBG(_n(" [%f, %f][%f] start circle\n"), x, y, r);
 
 	for (int8_t i = iterations; i > 0; --i){
-	
+
         //@size=128B
 		// DBG(_n(" [%f, %f][%f] circle\n"), x, y, r);
 
@@ -901,7 +909,7 @@ uint8_t find_patterns(uint8_t *matrix32, uint16_t *pattern08, uint16_t *pattern1
 		row = r08;
 		return match08;
 	}
-	
+
 	col = c10;
 	row = r10;
 	return match10;
@@ -1005,10 +1013,21 @@ BedSkewOffsetDetectionResultType xyzcal_find_bed_induction_sensor_point_xy(void)
     //@size=258
     // DBG(_n("xyzcal_find_bed_induction_sensor_point_xy x=%ld y=%ld z=%ld\n"), count_position[X_AXIS], count_position[Y_AXIS], count_position[Z_AXIS]);
 	st_synchronize();
+  	pos_i16_t x = _X;
+  	pos_i16_t y = _Y;
+  	pos_i16_t z = _Z;
 
+ 	uint8_t point = xyzcal_xycoords2point(x, y);
+  	x = pgm_read_word((uint16_t *)(xyzcal_point_xcoords + point));
+  	y = pgm_read_word((uint16_t *)(xyzcal_point_ycoords + point));
+  	DBG(_n("point=%d x=%d y=%d z=%d\n"), point, x, y, z);
 	xyzcal_meassure_enter();
-	if (xyzcal_searchZ())
+  	xyzcal_lineXYZ_to(x, y, z, 200, 0);
+  	if (xyzcal_searchZ()){
+		int16_t z = _Z;
+		xyzcal_lineXYZ_to(x, y, z, 200, 0);
 		ret = xyzcal_scan_and_process();
+  	}
 	xyzcal_meassure_leave();
 	return ret;
 }
