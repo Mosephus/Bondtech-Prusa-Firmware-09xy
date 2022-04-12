@@ -19,7 +19,7 @@
 #define DEVELOPER
 
 // Printer name
-#define CUSTOM_MENDEL_NAME "LGX-SC-HT MK3S"
+#define CUSTOM_MENDEL_NAME "LGXSM-PT1000"
 
 // Electronics
 #define MOTHERBOARD BOARD_EINSY_1_0a
@@ -36,8 +36,8 @@
 //#define E3D_PT100_BED_NO_AMP
 
 // Extruder
-#define BONDTECH_LGX_SC //Shortcut Copperhead
-//#define BONDTECH_LGX_SM //Shortcut Mosquito
+//#define BONDTECH_LGX_SC //Shortcut Copperhead
+#define BONDTECH_LGX_SM //Shortcut Mosquito
 
 /*------------------------------------
  AXIS SETTINGS
@@ -591,7 +591,7 @@
 #elif defined(E3D_PT100_EXTRUDER_NO_AMP)
 #define TEMP_SENSOR_0 148
 #else
-#define TEMP_SENSOR_0 800
+#define TEMP_SENSOR_0 1047
 #endif
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0

@@ -38,9 +38,6 @@
 // Extruder
 //#define BONDTECH_LGX_SC //Shortcut Copperhead
 #define BONDTECH_LGX_SM //Shortcut Mosquito
-//#define BONDTECH_MK3S
-//#define BONDTECH_MOSQUITO
-//#define BONDTECH_MOSQUITO_MAGNUM
 
 /*------------------------------------
  AXIS SETTINGS
