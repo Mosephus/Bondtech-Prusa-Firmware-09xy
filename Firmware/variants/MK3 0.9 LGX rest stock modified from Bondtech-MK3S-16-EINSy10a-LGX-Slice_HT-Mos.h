@@ -36,7 +36,7 @@
 //#define E3D_PT100_BED_NO_AMP
 
 // Extruder
-#define BONDTECH_MK3S
+//#define BONDTECH_MK3S                             // commented for MK3 use
 //#define BONDTECH_MOSQUITO
 //#define BONDTECH_MOSQUITO_MAGNUM
 
@@ -390,8 +390,8 @@
 #define EXTRUDER_2_AUTO_FAN_PIN   -1
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
 #define EXTRUDER_AUTO_FAN_SPEED   255  // == full speed
-#define EXTRUDER_ALTFAN_DETECT
-#define EXTRUDER_ALTFAN_SPEED_SILENT 255
+//#define EXTRUDER_ALTFAN_DETECT            // commented because no use for MK3
+//#define EXTRUDER_ALTFAN_SPEED_SILENT 255  // commented because no use for MK3
 
 
 
